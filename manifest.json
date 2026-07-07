@@ -11,7 +11,7 @@
         "*://www.linkedin.com/games/mini-sudoku/*",
         "*://www.linkedin.com/games/queens/*"
       ],
-      "js": ["content.js"]
+      "js": ["queens_solver.js", "content.js"]
     }
   ],
   "permissions": ["activeTab"]

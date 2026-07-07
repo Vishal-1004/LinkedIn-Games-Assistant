@@ -1,5 +1,46 @@
 // content.js
 
+function collectQueensData() {
+  const cells = document.querySelectorAll("[data-cell-idx]");
+  return Array.from(cells).map((cell) => {
+    const label = cell.getAttribute("aria-label") || "";
+    const colorMatch = label.match(/color\s+([^,]+)/i);
+    return { color: colorMatch ? colorMatch[1] : "Unknown" };
+  });
+}
+
+function solveQueensOnPage() {
+  if (typeof getSolvedQueens !== "function") {
+    return { success: false, error: "Queens solver is not available." };
+  }
+
+  const cellData = collectQueensData();
+  const result = getSolvedQueens(cellData);
+  if (!result.success) {
+    return result;
+  }
+
+  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
+  const solution = result.solution || [];
+
+  cells.forEach((cell, index) => {
+    if (solution[index] === 1) {
+      window.setTimeout(() => {
+        if (typeof cell.click === "function") {
+          cell.click();
+        }
+      }, index * 35);
+    }
+  });
+
+  return {
+    ...result,
+    filledIndices: solution
+      .map((value, index) => (value === 1 ? index : null))
+      .filter((value) => value !== null),
+  };
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "GET_SUDOKU_DATA") {
     const cells = document.querySelectorAll("[data-cell-idx]");
@@ -11,16 +52,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
     sendResponse({ data: board });
   } else if (request.action === "GET_QUEENS_DATA") {
-    const cells = document.querySelectorAll("[data-cell-idx]");
-    let cellData = [];
-    cells.forEach((cell) => {
-      let label = cell.getAttribute("aria-label") || "";
-      // Extract color from aria-label string like "Empty cell of color Lavender, row 1, column 1"
-      let colorMatch = label.match(/color\s+([^,]+)/);
-      let color = colorMatch ? colorMatch[1] : "Unknown";
-      cellData.push({ color: color });
-    });
-    sendResponse({ data: cellData });
+    sendResponse({ data: collectQueensData() });
+  } else if (request.action === "SOLVE_QUEENS") {
+    const result = solveQueensOnPage();
+    sendResponse(result);
   }
 
   return true;

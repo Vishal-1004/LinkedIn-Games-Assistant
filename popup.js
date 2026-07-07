@@ -46,16 +46,13 @@ document
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     chrome.tabs.sendMessage(
       tab.id,
-      { action: "GET_QUEENS_DATA" },
+      { action: "SOLVE_QUEENS" },
       (response) => {
-        if (!response || !response.data)
-          return (outputDiv.innerText = "Error reading queens grid.");
-        const result = getSolvedQueens(response.data);
-        if (result.success) {
-          outputDiv.innerHTML = `<strong>Queens Matrix (1 = Queen):</strong><br>${JSON.stringify(result.solution)}<br><br>Row indices for Queens: [${result.rawRows.join(", ")}]`;
-        } else {
-          outputDiv.innerText = "Error: " + result.error;
+        if (!response || !response.success) {
+          return (outputDiv.innerText = "Error: " + (response?.error || "Could not solve queens board."));
         }
+
+        outputDiv.innerHTML = `<strong>Queens solution filled.</strong><br>Placed queens at cells: [${response.filledIndices.join(", ")}]`;
       },
     );
   });
