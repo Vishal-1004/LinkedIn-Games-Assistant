@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "LinkedIn Games Assistant",
+  "version": "2.0",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.linkedin.com/games/mini-sudoku/*",
+        "*://www.linkedin.com/games/queens/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "permissions": ["activeTab"]
+}
