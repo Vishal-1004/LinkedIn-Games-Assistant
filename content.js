@@ -9,6 +9,34 @@ function collectQueensData() {
   });
 }
 
+function clearQueensHighlights() {
+  document.querySelectorAll("[data-queen-highlight]").forEach((cell) => {
+    cell.removeAttribute("data-queen-highlight");
+    cell.style.removeProperty("outline");
+    cell.style.removeProperty("outline-offset");
+    cell.style.removeProperty("box-shadow");
+    cell.style.removeProperty("background-color");
+    cell.style.removeProperty("transition");
+  });
+}
+
+function highlightQueens(solution) {
+  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
+
+  clearQueensHighlights();
+
+  cells.forEach((cell, index) => {
+    if (solution[index] === 1) {
+      cell.setAttribute("data-queen-highlight", "true");
+      cell.style.outline = "3px solid #ffbf00";
+      cell.style.outlineOffset = "-3px";
+      cell.style.boxShadow = "0 0 0 4px rgba(255, 191, 0, 0.35)";
+      cell.style.backgroundColor = "rgba(255, 191, 0, 0.18)";
+      cell.style.transition = "all 0.2s ease";
+    }
+  });
+}
+
 function solveQueensOnPage() {
   if (typeof getSolvedQueens !== "function") {
     return { success: false, error: "Queens solver is not available." };
@@ -23,13 +51,16 @@ function solveQueensOnPage() {
   const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
   const solution = result.solution || [];
 
+  highlightQueens(solution);
+
   cells.forEach((cell, index) => {
     if (solution[index] === 1) {
       window.setTimeout(() => {
         if (typeof cell.click === "function") {
           cell.click();
         }
-      }, index * 35);
+        cell.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      }, index * 45);
     }
   });
 
