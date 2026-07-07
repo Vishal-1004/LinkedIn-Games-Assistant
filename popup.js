@@ -60,11 +60,11 @@ document
       (response) => {
         if (!response || !response.success) {
           outputDiv.classList.add("show");
-          return (outputDiv.innerText = "Unable to solve the Queens board. " + (response?.error || ""));
+          return (outputDiv.innerText = "Unable to solve the Queens board right now. Please refresh the website and try again.");
         }
 
         outputDiv.classList.add("show");
-        outputDiv.innerHTML = `<strong>Queens solution ready.</strong><br>Highlighted and placed queens at cells: [${response.filledIndices.join(", ")}]`;
+        outputDiv.innerHTML = `<strong>Correct queen cells are highlighted.</strong><br>Hurry up and fill them before the time runs out!`;
       },
     );
   });
