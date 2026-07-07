@@ -33,12 +33,16 @@ document
       tab.id,
       { action: "GET_SUDOKU_DATA" },
       (response) => {
-        if (!response || !response.data)
+        if (!response || !response.data) {
+          outputDiv.classList.add("show");
           return (outputDiv.innerText = "Unable to read the Sudoku board from this page.");
+        }
         const result = getSolvedSudoku(response.data);
         if (result.success) {
+          outputDiv.classList.add("show");
           outputDiv.innerHTML = `<strong>Sudoku ready.</strong><br>The solution has been computed for the current board.`;
         } else {
+          outputDiv.classList.add("show");
           outputDiv.innerText = "Unable to solve this Sudoku board. " + result.error;
         }
       },
@@ -55,9 +59,11 @@ document
       { action: "SOLVE_QUEENS" },
       (response) => {
         if (!response || !response.success) {
+          outputDiv.classList.add("show");
           return (outputDiv.innerText = "Unable to solve the Queens board. " + (response?.error || ""));
         }
 
+        outputDiv.classList.add("show");
         outputDiv.innerHTML = `<strong>Queens solution ready.</strong><br>Highlighted and placed queens at cells: [${response.filledIndices.join(", ")}]`;
       },
     );

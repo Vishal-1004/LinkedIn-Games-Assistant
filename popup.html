@@ -7,13 +7,11 @@
       :root {
         color-scheme: light;
         --bg: #f5f7fb;
-        --panel: #ffffff;
         --text: #1f2937;
         --muted: #6b7280;
         --accent: #0a66c2;
         --accent-2: #2563eb;
         --border: #e5e7eb;
-        --success: #0f9d58;
       }
 
       * {
@@ -21,52 +19,34 @@
       }
 
       body {
-        width: 260px;
+        width: 280px;
         margin: 0;
-        padding: 14px;
+        padding: 0;
         font-family: Inter, "Segoe UI", Roboto, sans-serif;
         background: linear-gradient(135deg, #f8fbff 0%, var(--bg) 100%);
         color: var(--text);
       }
 
-      .card {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 14px;
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      .popup-shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 14px 14px 10px;
       }
 
-      .title-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+      .header {
         margin-bottom: 10px;
       }
 
       .title {
         margin: 0;
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 700;
-      }
-
-      .badge {
-        font-size: 10px;
-        font-weight: 700;
-        padding: 4px 8px;
-        border-radius: 999px;
-        background: #dbeafe;
         color: var(--accent);
       }
 
-      .subtitle {
-        margin: 0 0 10px;
-        font-size: 12px;
-        color: var(--muted);
-      }
-
       .status {
-        margin-bottom: 10px;
+        margin-top: 6px;
         padding: 8px 10px;
         border-radius: 10px;
         font-size: 12px;
@@ -75,14 +55,20 @@
         color: var(--text);
       }
 
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
       .section {
-        margin-top: 8px;
+        margin-top: 4px;
       }
 
       button {
         width: 100%;
         padding: 10px 12px;
-        margin-bottom: 7px;
         cursor: pointer;
         border: none;
         border-radius: 10px;
@@ -104,7 +90,8 @@
       }
 
       #output {
-        margin-top: 10px;
+        display: none;
+        margin-top: 6px;
         padding: 10px;
         border-radius: 10px;
         font-size: 12px;
@@ -115,29 +102,52 @@
         color: var(--text);
       }
 
+      #output.show {
+        display: block;
+      }
+
+      .footer {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+        font-size: 11px;
+        text-align: center;
+        color: var(--muted);
+      }
+
+      .footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
       .hidden {
         display: none;
       }
     </style>
   </head>
   <body>
-    <div class="card">
-      <div class="title-row">
-        <h3 class="title">Puzzle Assistant</h3>
-        <span class="badge">LinkedIn Games</span>
-      </div>
-      <p class="subtitle">Solve puzzles quickly with a polished assistant.</p>
-      <div id="game-detector" class="status">Detecting game...</div>
-
-      <div id="sudoku-section" class="section hidden">
-        <button id="run-sudoku-solver">Solve Sudoku</button>
+    <div class="popup-shell">
+      <div class="header">
+        <h3 class="title">LinkedIn Games Assistant</h3>
+        <div id="game-detector" class="status">Detecting game...</div>
       </div>
 
-      <div id="queens-section" class="section hidden">
-        <button id="run-queens-solver">Solve Queens</button>
+      <div class="content">
+        <div id="sudoku-section" class="section hidden">
+          <button id="run-sudoku-solver">Solve Sudoku</button>
+        </div>
+
+        <div id="queens-section" class="section hidden">
+          <button id="run-queens-solver">Solve Queens</button>
+        </div>
+
+        <div id="output"></div>
       </div>
 
-      <div id="output">Ready to assist.</div>
+      <div class="footer">
+        Made with <span>♥</span> by <a href="https://www.linkedin.com/in/vishalky104/" target="_blank" rel="noopener noreferrer">Vishal</a>
+      </div>
     </div>
 
     <script src="sudoku_solver.js"></script>
