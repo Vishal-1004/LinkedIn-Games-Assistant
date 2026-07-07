@@ -82,15 +82,19 @@ document
     let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     chrome.tabs.sendMessage(
       tab.id,
-      { action: "SOLVE_TANGO" },
+      { action: "SOLVE_TANGO", debug: true },
       (response) => {
         if (!response || !response.success) {
           outputDiv.classList.add("show");
           return (outputDiv.innerText = "Unable to solve the Tango board right now. Please refresh the website and try again.");
         }
 
+        if (response.debugData) {
+          console.log("[Tango Debug] Popup received data:", response.debugData);
+        }
+
         outputDiv.classList.add("show");
-        outputDiv.innerHTML = `<strong>Tango solution applied.</strong><br>Complete the board with the highlighted choices.`;
+        outputDiv.innerHTML = `<strong>Tango debug mode enabled.</strong><br>Open the LinkedIn page DevTools console to inspect the scraped board data.`;
       },
     );
   });

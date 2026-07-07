@@ -72,8 +72,33 @@ function solveQueensOnPage() {
   };
 }
 
+function collectTangoData() {
+  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
+
+  return cells.map((cell, index) => {
+    const svg = cell.querySelector("svg[aria-label]");
+    const label = svg?.getAttribute("aria-label") || "";
+    const iconLabels = Array.from(cell.querySelectorAll("svg[aria-label]"))
+      .map((svgItem) => svgItem.getAttribute("aria-label"))
+      .filter(Boolean);
+
+    return {
+      index,
+      dataCellIdx: cell.getAttribute("data-cell-idx"),
+      label,
+      iconLabels,
+      text: (cell.innerText || "").trim(),
+      className: cell.className || "",
+      htmlSnippet: (cell.innerHTML || "").slice(0, 300),
+    };
+  });
+}
+
 function highlightTangoIcons() {
   const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
+  const debugData = collectTangoData();
+
+  console.log("[Tango Debug] Scraped board data:", debugData);
 
   cells.forEach((cell) => {
     const svg = cell.querySelector("svg[aria-label]");
@@ -100,10 +125,14 @@ function highlightTangoIcons() {
     }
   });
 
-  return { success: true, highlighted: cells.filter((cell) => {
-    const svg = cell.querySelector("svg[aria-label]");
-    return svg && (svg.getAttribute("aria-label") === "Sun" || svg.getAttribute("aria-label") === "Moon");
-  }).length };
+  return {
+    success: true,
+    highlighted: cells.filter((cell) => {
+      const svg = cell.querySelector("svg[aria-label]");
+      return svg && (svg.getAttribute("aria-label") === "Sun" || svg.getAttribute("aria-label") === "Moon");
+    }).length,
+    debugData,
+  };
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -123,6 +152,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse(result);
   } else if (request.action === "SOLVE_TANGO") {
     const result = highlightTangoIcons();
+    if (request.debug) {
+      console.log("[Tango Debug] Popup requested debug data:", result.debugData);
+    }
     sendResponse(result);
   }
 
