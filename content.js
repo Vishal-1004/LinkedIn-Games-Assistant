@@ -72,6 +72,40 @@ function solveQueensOnPage() {
   };
 }
 
+function highlightTangoIcons() {
+  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
+
+  cells.forEach((cell) => {
+    const svg = cell.querySelector("svg[aria-label]");
+    const label = svg?.getAttribute("aria-label") || "";
+
+    cell.style.removeProperty("outline");
+    cell.style.removeProperty("outline-offset");
+    cell.style.removeProperty("box-shadow");
+    cell.style.removeProperty("background-color");
+    cell.style.removeProperty("transition");
+
+    if (label === "Sun") {
+      cell.style.outline = "3px solid #ffbf00";
+      cell.style.outlineOffset = "-3px";
+      cell.style.boxShadow = "0 0 0 4px rgba(255, 191, 0, 0.35)";
+      cell.style.backgroundColor = "rgba(255, 191, 0, 0.22)";
+      cell.style.transition = "all 0.2s ease";
+    } else if (label === "Moon") {
+      cell.style.outline = "3px solid #ffffff";
+      cell.style.outlineOffset = "-3px";
+      cell.style.boxShadow = "0 0 0 4px rgba(255, 255, 255, 0.6)";
+      cell.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+      cell.style.transition = "all 0.2s ease";
+    }
+  });
+
+  return { success: true, highlighted: cells.filter((cell) => {
+    const svg = cell.querySelector("svg[aria-label]");
+    return svg && (svg.getAttribute("aria-label") === "Sun" || svg.getAttribute("aria-label") === "Moon");
+  }).length };
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "GET_SUDOKU_DATA") {
     const cells = document.querySelectorAll("[data-cell-idx]");
@@ -88,35 +122,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const result = solveQueensOnPage();
     sendResponse(result);
   } else if (request.action === "SOLVE_TANGO") {
-    if (typeof getSolvedTango !== "function") {
-      sendResponse({ success: false, error: "Tango solver is not available." });
-      return true;
-    }
-
-    const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
-    const result = getSolvedTango(cells);
-    if (result.success) {
-      cells.forEach((cell, index) => {
-        const value = result.solution[index];
-        if (value === "S" || value === "M") {
-          const svg = cell.querySelector("svg[data-testid='cell-empty']");
-          if (svg && !cell.getAttribute("aria-disabled") === "true") {
-            const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            icon.setAttribute("width", "24");
-            icon.setAttribute("height", "24");
-            icon.setAttribute("viewBox", "0 0 24 24");
-            icon.setAttribute("fill", "none");
-            icon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-            icon.setAttribute("aria-label", value === "S" ? "Sun" : "Moon");
-            icon.setAttribute("data-testid", value === "S" ? "cell-zero" : "cell-one");
-            icon.innerHTML = value === "S"
-              ? '<g id="Sun"><path d="M12 2V4M12 20V22M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M2 12H4M20 12H22M4.93 19.07L6.34 17.66M17.66 6.34L19.07 4.93" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g>'
-              : '<g id="Moon"><path d="M20 13.5A8.5 8.5 0 1 1 10.5 4a6.5 6.5 0 1 0 9.5 9.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>';
-            svg.replaceWith(icon);
-          }
-        }
-      });
-    }
+    const result = highlightTangoIcons();
     sendResponse(result);
   }
 
