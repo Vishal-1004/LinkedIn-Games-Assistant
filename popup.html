@@ -4,49 +4,141 @@
     <meta charset="utf-8" />
     <title>Puzzle Assistant</title>
     <style>
-      body {
-        width: 220px;
-        padding: 10px;
-        font-family: sans-serif;
+      :root {
+        color-scheme: light;
+        --bg: #f5f7fb;
+        --panel: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --accent: #0a66c2;
+        --accent-2: #2563eb;
+        --border: #e5e7eb;
+        --success: #0f9d58;
       }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        width: 260px;
+        margin: 0;
+        padding: 14px;
+        font-family: Inter, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(135deg, #f8fbff 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      }
+
+      .title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: var(--accent);
+      }
+
+      .subtitle {
+        margin: 0 0 10px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .status {
+        margin-bottom: 10px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #f3f4f6;
+        color: var(--text);
+      }
+
+      .section {
+        margin-top: 8px;
+      }
+
       button {
         width: 100%;
-        padding: 10px;
-        margin-bottom: 5px;
+        padding: 10px 12px;
+        margin-bottom: 7px;
         cursor: pointer;
-        background: #0a66c2;
-        color: white;
         border: none;
-        border-radius: 4px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: white;
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
+
       button:hover {
-        background: #004182;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
       }
+
+      button:active {
+        transform: translateY(0);
+      }
+
       #output {
         margin-top: 10px;
+        padding: 10px;
+        border-radius: 10px;
         font-size: 12px;
+        line-height: 1.4;
         word-wrap: break-word;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: var(--text);
       }
+
       .hidden {
         display: none;
       }
     </style>
   </head>
   <body>
-    <h3>Puzzle Assistant</h3>
-    <div id="game-detector">Detecting game...</div>
+    <div class="card">
+      <div class="title-row">
+        <h3 class="title">Puzzle Assistant</h3>
+        <span class="badge">LinkedIn Games</span>
+      </div>
+      <p class="subtitle">Solve puzzles quickly with a polished assistant.</p>
+      <div id="game-detector" class="status">Detecting game...</div>
 
-    <!-- Sudoku Interface -->
-    <div id="sudoku-section" class="hidden">
-      <button id="run-sudoku-solver">Solve Sudoku</button>
+      <div id="sudoku-section" class="section hidden">
+        <button id="run-sudoku-solver">Solve Sudoku</button>
+      </div>
+
+      <div id="queens-section" class="section hidden">
+        <button id="run-queens-solver">Solve Queens</button>
+      </div>
+
+      <div id="output">Ready to assist.</div>
     </div>
-
-    <!-- Queens Interface -->
-    <div id="queens-section" class="hidden">
-      <button id="run-queens-solver">Solve Queens</button>
-    </div>
-
-    <div id="output"></div>
 
     <script src="sudoku_solver.js"></script>
     <script src="queens_solver.js"></script>

@@ -8,13 +8,19 @@ const queensSection = document.getElementById("queens-section");
 // Identify active tab context on load
 chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
   if (tab.url.includes("mini-sudoku")) {
-    detectorDiv.innerText = "Game: Mini Sudoku";
+    detectorDiv.innerText = "Active game: Mini Sudoku";
+    detectorDiv.style.background = "#ecfdf3";
+    detectorDiv.style.color = "#166534";
     sudokuSection.classList.remove("hidden");
   } else if (tab.url.includes("queens")) {
-    detectorDiv.innerText = "Game: Queens";
+    detectorDiv.innerText = "Active game: Queens";
+    detectorDiv.style.background = "#ecfdf3";
+    detectorDiv.style.color = "#166534";
     queensSection.classList.remove("hidden");
   } else {
-    detectorDiv.innerText = "Not a recognized game page.";
+    detectorDiv.innerText = "Open a supported LinkedIn game page.";
+    detectorDiv.style.background = "#fef3c7";
+    detectorDiv.style.color = "#92400e";
   }
 });
 
@@ -28,12 +34,12 @@ document
       { action: "GET_SUDOKU_DATA" },
       (response) => {
         if (!response || !response.data)
-          return (outputDiv.innerText = "Error reading board.");
+          return (outputDiv.innerText = "Unable to read the Sudoku board from this page.");
         const result = getSolvedSudoku(response.data);
         if (result.success) {
-          outputDiv.innerHTML = `<strong>Sudoku Solution:</strong><br>[${result.solution.join(", ")}]`;
+          outputDiv.innerHTML = `<strong>Sudoku ready.</strong><br>The solution has been computed for the current board.`;
         } else {
-          outputDiv.innerText = "Error: " + result.error;
+          outputDiv.innerText = "Unable to solve this Sudoku board. " + result.error;
         }
       },
     );
@@ -49,10 +55,10 @@ document
       { action: "SOLVE_QUEENS" },
       (response) => {
         if (!response || !response.success) {
-          return (outputDiv.innerText = "Error: " + (response?.error || "Could not solve queens board."));
+          return (outputDiv.innerText = "Unable to solve the Queens board. " + (response?.error || ""));
         }
 
-        outputDiv.innerHTML = `<strong>Queens solution filled.</strong><br>Placed queens at cells: [${response.filledIndices.join(", ")}]`;
+        outputDiv.innerHTML = `<strong>Queens solution ready.</strong><br>Highlighted and placed queens at cells: [${response.filledIndices.join(", ")}]`;
       },
     );
   });
