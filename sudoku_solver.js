@@ -64,7 +64,6 @@ function solveGrid(board) {
  * Main wrapper function to validate the input and return the solved array.
  */
 function getSolvedSudoku(boardArray) {
-  // Validate the input: Must exist, be an array, and have exactly 36 cells
   if (!Array.isArray(boardArray) || boardArray.length !== 36) {
     return {
       success: false,
@@ -72,8 +71,12 @@ function getSolvedSudoku(boardArray) {
     };
   }
 
-  // Check if it's completely empty (all zeros)
-  const isCompletelyEmpty = boardArray.every((cell) => cell === 0);
+  const normalizedBoard = boardArray.map((cell) => {
+    if (cell === null || cell === undefined || cell === "") return 0;
+    return Number(cell);
+  });
+
+  const isCompletelyEmpty = normalizedBoard.every((cell) => cell === 0);
   if (isCompletelyEmpty) {
     return {
       success: false,
@@ -81,10 +84,8 @@ function getSolvedSudoku(boardArray) {
     };
   }
 
-  // Create a copy so we don't mutate the original array
-  let boardCopy = [...boardArray];
+  let boardCopy = [...normalizedBoard];
 
-  // Run the solver
   if (solveGrid(boardCopy)) {
     return { success: true, solution: boardCopy };
   } else {

@@ -2,15 +2,66 @@
 
 function collectSudokuBoard() {
   const cells = document.querySelectorAll("[data-cell-idx]");
-  const board = new Array(36).fill(0);
+  const board = new Array(36).fill(null);
 
   cells.forEach((cell) => {
     const idx = parseInt(cell.getAttribute("data-cell-idx"), 10);
-    const val = cell.innerText.trim();
-    board[idx] = val === "" ? 0 : parseInt(val, 10);
+    const contentCell = cell.querySelector(".sudoku-cell-content");
+    const rawValue = (contentCell?.textContent || cell.textContent || "").trim();
+    board[idx] = rawValue === "" ? null : parseInt(rawValue, 10);
   });
 
   return board;
+}
+
+function fillSolvedSudokuBoard(solution) {
+  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
+  const filledIndices = [];
+
+  cells.forEach((cell, index) => {
+    const contentCell = cell.querySelector(".sudoku-cell-content");
+    const currentValue = (contentCell?.textContent || cell.textContent || "").trim();
+    const isEmpty = currentValue === "";
+
+    if (isEmpty && solution && solution[index] != null) {
+      const value = solution[index];
+      if (contentCell) {
+        contentCell.textContent = String(value);
+      } else {
+        cell.textContent = String(value);
+      }
+
+      filledIndices.push(index);
+      if (typeof cell.click === "function") {
+        cell.click();
+      }
+      cell.dispatchEvent(new KeyboardEvent("keydown", { key: String(value), bubbles: true }));
+    }
+  });
+
+  return filledIndices;
+}
+
+function solveSudokuOnPage() {
+  const board = collectSudokuBoard();
+  console.log("[Sudoku] Current board:", board);
+
+  if (typeof getSolvedSudoku !== "function") {
+    return { success: false, error: "Sudoku solver is not available." };
+  }
+
+  const result = getSolvedSudoku(board);
+  if (!result.success) {
+    return result;
+  }
+
+  const filledIndices = fillSolvedSudokuBoard(result.solution);
+  console.log("[Sudoku] Solved board:", result.solution);
+
+  return {
+    ...result,
+    filledIndices,
+  };
 }
 
 function collectQueensData() {
@@ -89,9 +140,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "GET_SUDOKU_DATA") {
     sendResponse({ data: collectSudokuBoard() });
   } else if (request.action === "SOLVE_SUDOKU") {
-    const board = collectSudokuBoard();
-    const result = typeof getSolvedSudoku === "function" ? getSolvedSudoku(board) : { success: false, error: "Sudoku solver is not available." };
-    sendResponse(result);
+    sendResponse(solveSudokuOnPage());
   } else if (request.action === "GET_QUEENS_DATA") {
     sendResponse({ data: collectQueensData() });
   } else if (request.action === "SOLVE_QUEENS") {
