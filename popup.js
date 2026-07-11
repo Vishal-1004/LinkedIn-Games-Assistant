@@ -4,6 +4,7 @@ const outputDiv = document.getElementById("output");
 const detectorDiv = document.getElementById("game-detector");
 const sudokuSection = document.getElementById("sudoku-section");
 const queensSection = document.getElementById("queens-section");
+const tangoSection = document.getElementById("tango-section");
 
 chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
   if (tab.url.includes("mini-sudoku")) {
@@ -16,8 +17,13 @@ chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     detectorDiv.style.background = "#ecfdf3";
     detectorDiv.style.color = "#166534";
     queensSection.classList.remove("hidden");
+  } else if (tab.url.includes("tango")) {
+    detectorDiv.innerText = "Active game: Tango";
+    detectorDiv.style.background = "#ecfdf3";
+    detectorDiv.style.color = "#166534";
+    tangoSection.classList.remove("hidden");
   } else {
-    detectorDiv.innerText = "Open a supported LinkedIn Sudoku or Queens page.";
+    detectorDiv.innerText = "Open a supported LinkedIn Sudoku, Queens, or Tango page.";
     detectorDiv.style.background = "#fef3c7";
     detectorDiv.style.color = "#92400e";
   }
@@ -46,5 +52,18 @@ document.getElementById("run-queens-solver").addEventListener("click", async () 
     }
 
     outputDiv.innerHTML = "<strong>Correct queen cells are highlighted.</strong><br>Hurry up and fill them before the time runs out!";
+  });
+});
+
+document.getElementById("run-tango-data").addEventListener("click", async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  chrome.tabs.sendMessage(tab.id, { action: "GET_TANGO_DATA" }, (response) => {
+    outputDiv.classList.add("show");
+    if (!response || !response.data) {
+      outputDiv.innerText = "Unable to read the Tango board from this page.";
+      return;
+    }
+
+    outputDiv.innerHTML = "<strong>Tango board read.</strong><br>Check the console for the extracted Moon/Sun array.";
   });
 });

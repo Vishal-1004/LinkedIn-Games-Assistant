@@ -9,7 +9,8 @@
     {
       "matches": [
         "*://www.linkedin.com/games/mini-sudoku/*",
-        "*://www.linkedin.com/games/queens/*"
+        "*://www.linkedin.com/games/queens/*",
+        "*://www.linkedin.com/games/tango/*"
       ],
       "js": ["sudoku_solver.js", "queens_solver.js", "content.js"]
     }
