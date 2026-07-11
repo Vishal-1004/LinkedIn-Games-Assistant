@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "LinkedIn Games Assistant",
+  "name": "LinkedIn Sudoku & Queens Assistant",
   "version": "2.0",
   "action": {
     "default_popup": "popup.html"
@@ -11,7 +11,7 @@
         "*://www.linkedin.com/games/mini-sudoku/*",
         "*://www.linkedin.com/games/queens/*"
       ],
-      "js": ["queens_solver.js", "tango_solver.js", "content.js"]
+      "js": ["queens_solver.js", "content.js"]
     }
   ],
   "permissions": ["activeTab"]

@@ -72,90 +72,20 @@ function solveQueensOnPage() {
   };
 }
 
-function collectTangoData() {
-  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
-
-  return cells.map((cell, index) => {
-    const svg = cell.querySelector("svg[aria-label]");
-    const label = svg?.getAttribute("aria-label") || "";
-    const iconLabels = Array.from(cell.querySelectorAll("svg[aria-label]"))
-      .map((svgItem) => svgItem.getAttribute("aria-label"))
-      .filter(Boolean);
-
-    return {
-      index,
-      dataCellIdx: cell.getAttribute("data-cell-idx"),
-      label,
-      iconLabels,
-      text: (cell.innerText || "").trim(),
-      className: cell.className || "",
-      htmlSnippet: (cell.innerHTML || "").slice(0, 300),
-    };
-  });
-}
-
-function highlightTangoIcons() {
-  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
-  const debugData = collectTangoData();
-
-  console.log("[Tango Debug] Scraped board data:", debugData);
-
-  cells.forEach((cell) => {
-    const svg = cell.querySelector("svg[aria-label]");
-    const label = svg?.getAttribute("aria-label") || "";
-
-    cell.style.removeProperty("outline");
-    cell.style.removeProperty("outline-offset");
-    cell.style.removeProperty("box-shadow");
-    cell.style.removeProperty("background-color");
-    cell.style.removeProperty("transition");
-
-    if (label === "Sun") {
-      cell.style.outline = "3px solid #ffbf00";
-      cell.style.outlineOffset = "-3px";
-      cell.style.boxShadow = "0 0 0 4px rgba(255, 191, 0, 0.35)";
-      cell.style.backgroundColor = "rgba(255, 191, 0, 0.22)";
-      cell.style.transition = "all 0.2s ease";
-    } else if (label === "Moon") {
-      cell.style.outline = "3px solid #ffffff";
-      cell.style.outlineOffset = "-3px";
-      cell.style.boxShadow = "0 0 0 4px rgba(255, 255, 255, 0.6)";
-      cell.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
-      cell.style.transition = "all 0.2s ease";
-    }
-  });
-
-  return {
-    success: true,
-    highlighted: cells.filter((cell) => {
-      const svg = cell.querySelector("svg[aria-label]");
-      return svg && (svg.getAttribute("aria-label") === "Sun" || svg.getAttribute("aria-label") === "Moon");
-    }).length,
-    debugData,
-  };
-}
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "GET_SUDOKU_DATA") {
     const cells = document.querySelectorAll("[data-cell-idx]");
     let board = new Array(36).fill(0);
     cells.forEach((cell) => {
-      let idx = parseInt(cell.getAttribute("data-cell-idx"));
-      let val = cell.innerText.trim();
-      board[idx] = val === "" ? 0 : parseInt(val);
+      const idx = parseInt(cell.getAttribute("data-cell-idx"), 10);
+      const val = cell.innerText.trim();
+      board[idx] = val === "" ? 0 : parseInt(val, 10);
     });
     sendResponse({ data: board });
   } else if (request.action === "GET_QUEENS_DATA") {
     sendResponse({ data: collectQueensData() });
   } else if (request.action === "SOLVE_QUEENS") {
-    const result = solveQueensOnPage();
-    sendResponse(result);
-  } else if (request.action === "SOLVE_TANGO") {
-    const result = highlightTangoIcons();
-    if (request.debug) {
-      console.log("[Tango Debug] Popup requested debug data:", result.debugData);
-    }
-    sendResponse(result);
+    sendResponse(solveQueensOnPage());
   }
 
   return true;
