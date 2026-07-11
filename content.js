@@ -70,6 +70,18 @@ function solveSudokuOnPage() {
   };
 }
 
+function collectTangoBoard() {
+  const cells = document.querySelectorAll("[data-cell-idx]");
+  const board = Array.from(cells).map((cell) => {
+    const svg = cell.querySelector("svg[aria-label]");
+    const label = svg?.getAttribute("aria-label") || "";
+    return label === "Moon" ? "Moon" : label === "Sun" ? "Sun" : null;
+  });
+
+  console.log("[Tango] Board entries:", board);
+  return board;
+}
+
 function collectQueensData() {
   const cells = document.querySelectorAll("[data-cell-idx]");
   const data = Array.from(cells).map((cell) => {
@@ -158,6 +170,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ data: collectSudokuBoard() });
   } else if (request.action === "SOLVE_SUDOKU") {
     sendResponse(solveSudokuOnPage());
+  } else if (request.action === "GET_TANGO_DATA") {
+    sendResponse({ data: collectTangoBoard() });
   } else if (request.action === "GET_QUEENS_DATA") {
     sendResponse({ data: collectQueensData() });
   } else if (request.action === "SOLVE_QUEENS") {
