@@ -1,5 +1,18 @@
 // content.js
 
+function collectSudokuBoard() {
+  const cells = document.querySelectorAll("[data-cell-idx]");
+  const board = new Array(36).fill(0);
+
+  cells.forEach((cell) => {
+    const idx = parseInt(cell.getAttribute("data-cell-idx"), 10);
+    const val = cell.innerText.trim();
+    board[idx] = val === "" ? 0 : parseInt(val, 10);
+  });
+
+  return board;
+}
+
 function collectQueensData() {
   const cells = document.querySelectorAll("[data-cell-idx]");
   return Array.from(cells).map((cell) => {
@@ -74,14 +87,11 @@ function solveQueensOnPage() {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "GET_SUDOKU_DATA") {
-    const cells = document.querySelectorAll("[data-cell-idx]");
-    let board = new Array(36).fill(0);
-    cells.forEach((cell) => {
-      const idx = parseInt(cell.getAttribute("data-cell-idx"), 10);
-      const val = cell.innerText.trim();
-      board[idx] = val === "" ? 0 : parseInt(val, 10);
-    });
-    sendResponse({ data: board });
+    sendResponse({ data: collectSudokuBoard() });
+  } else if (request.action === "SOLVE_SUDOKU") {
+    const board = collectSudokuBoard();
+    const result = typeof getSolvedSudoku === "function" ? getSolvedSudoku(board) : { success: false, error: "Sudoku solver is not available." };
+    sendResponse(result);
   } else if (request.action === "GET_QUEENS_DATA") {
     sendResponse({ data: collectQueensData() });
   } else if (request.action === "SOLVE_QUEENS") {

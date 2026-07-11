@@ -25,20 +25,14 @@ chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
 
 document.getElementById("run-sudoku-solver").addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  chrome.tabs.sendMessage(tab.id, { action: "GET_SUDOKU_DATA" }, (response) => {
-    if (!response || !response.data) {
-      outputDiv.classList.add("show");
-      outputDiv.innerText = "Unable to read the Sudoku board from this page.";
+  chrome.tabs.sendMessage(tab.id, { action: "SOLVE_SUDOKU" }, (response) => {
+    outputDiv.classList.add("show");
+    if (!response || !response.success) {
+      outputDiv.innerText = "Unable to solve this Sudoku board. " + (response?.error || "Please refresh the page and try again.");
       return;
     }
 
-    const result = getSolvedSudoku(response.data);
-    outputDiv.classList.add("show");
-    if (result.success) {
-      outputDiv.innerHTML = "<strong>Sudoku ready.</strong><br>The solution has been computed for the current board.";
-    } else {
-      outputDiv.innerText = "Unable to solve this Sudoku board. " + result.error;
-    }
+    outputDiv.innerHTML = "<strong>Sudoku ready.</strong><br>The solution has been computed for the current board.";
   });
 });
 
