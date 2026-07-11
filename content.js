@@ -11,12 +11,15 @@ function collectSudokuBoard() {
     board[idx] = rawValue === "" ? null : parseInt(rawValue, 10);
   });
 
+  console.log("[Sudoku] Collected board:", board);
   return board;
 }
 
 function fillSolvedSudokuBoard(solution) {
   const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
   const filledIndices = [];
+
+  console.log("[Sudoku] Filling solved values into the board...");
 
   cells.forEach((cell, index) => {
     const contentCell = cell.querySelector(".sudoku-cell-content");
@@ -39,24 +42,27 @@ function fillSolvedSudokuBoard(solution) {
     }
   });
 
+  console.log("[Sudoku] Filled cells:", filledIndices);
   return filledIndices;
 }
 
 function solveSudokuOnPage() {
   const board = collectSudokuBoard();
-  console.log("[Sudoku] Current board:", board);
+  console.log("[Sudoku] Starting solver...");
 
   if (typeof getSolvedSudoku !== "function") {
     return { success: false, error: "Sudoku solver is not available." };
   }
 
   const result = getSolvedSudoku(board);
+  console.log("[Sudoku] Solver result:", result);
+
   if (!result.success) {
     return result;
   }
 
   const filledIndices = fillSolvedSudokuBoard(result.solution);
-  console.log("[Sudoku] Solved board:", result.solution);
+  console.log("[Sudoku] Final solved board:", result.solution);
 
   return {
     ...result,
@@ -66,11 +72,14 @@ function solveSudokuOnPage() {
 
 function collectQueensData() {
   const cells = document.querySelectorAll("[data-cell-idx]");
-  return Array.from(cells).map((cell) => {
+  const data = Array.from(cells).map((cell) => {
     const label = cell.getAttribute("aria-label") || "";
     const colorMatch = label.match(/color\s+([^,]+)/i);
     return { color: colorMatch ? colorMatch[1] : "Unknown" };
   });
+
+  console.log("[Queens] Collected data:", data);
+  return data;
 }
 
 function clearQueensHighlights() {
@@ -102,12 +111,16 @@ function highlightQueens(solution) {
 }
 
 function solveQueensOnPage() {
+  console.log("[Queens] Starting solver...");
+
   if (typeof getSolvedQueens !== "function") {
     return { success: false, error: "Queens solver is not available." };
   }
 
   const cellData = collectQueensData();
   const result = getSolvedQueens(cellData);
+  console.log("[Queens] Solver result:", result);
+
   if (!result.success) {
     return result;
   }
@@ -128,11 +141,15 @@ function solveQueensOnPage() {
     }
   });
 
+  const filledIndices = solution
+    .map((value, index) => (value === 1 ? index : null))
+    .filter((value) => value !== null);
+
+  console.log("[Queens] Filled indices:", filledIndices);
+
   return {
     ...result,
-    filledIndices: solution
-      .map((value, index) => (value === 1 ? index : null))
-      .filter((value) => value !== null),
+    filledIndices,
   };
 }
 

@@ -60,5 +60,6 @@ function getSolvedQueens(cellData) {
     return { success: false, error: "No Queens grid detected." };
   const size = Math.sqrt(cellData.length);
   const regions = cellData.map((c) => c.color);
+  console.log("[Queens Solver] Input regions:", regions);
   return solveQueens(size, regions);
 }
