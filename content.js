@@ -82,6 +82,97 @@ function collectTangoBoard() {
   return board;
 }
 
+function fillSolvedTangoBoard(solution) {
+  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
+  const filledIndices = [];
+
+  console.log("[Tango] Filling solved values into the board...");
+
+  cells.forEach((cell, index) => {
+    const svg = cell.querySelector("svg[aria-label]");
+    const currentLabel = svg?.getAttribute("aria-label") || "";
+    const target = solution && solution[index] ? solution[index] : null;
+
+    if (target && currentLabel !== target) {
+      if (svg) {
+        svg.setAttribute("aria-label", target);
+      } else {
+        cell.setAttribute("aria-label", target);
+      }
+
+      // Try to trigger any page handlers by clicking the cell
+      if (typeof cell.click === "function") {
+        cell.click();
+      }
+      cell.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+
+      filledIndices.push(index);
+    }
+  });
+
+  console.log("[Tango] Filled cells:", filledIndices);
+  return filledIndices;
+}
+
+function highlightTango(solution) {
+  const cells = Array.from(document.querySelectorAll("[data-cell-idx]"));
+
+  // Clear any existing highlights first
+  cells.forEach((cell) => {
+    cell.removeAttribute("data-tango-highlight");
+    cell.style.removeProperty("outline");
+    cell.style.removeProperty("outline-offset");
+    cell.style.removeProperty("box-shadow");
+    cell.style.removeProperty("background-color");
+    cell.style.removeProperty("transition");
+  });
+
+  cells.forEach((cell, index) => {
+    const value = solution && solution[index] ? solution[index] : null;
+    if (value === "Moon") {
+      cell.setAttribute("data-tango-highlight", "moon");
+      cell.style.outline = "3px solid #ffffff";
+      cell.style.outlineOffset = "-3px";
+      cell.style.boxShadow = "0 0 0 4px rgba(255,255,255,0.35)";
+      cell.style.backgroundColor = "#ffffff";
+      cell.style.transition = "all 0.2s ease";
+    } else if (value === "Sun") {
+      cell.setAttribute("data-tango-highlight", "sun");
+      cell.style.outline = "3px solid #ffbf00";
+      cell.style.outlineOffset = "-3px";
+      cell.style.boxShadow = "0 0 0 4px rgba(255, 191, 0, 0.35)";
+      cell.style.backgroundColor = "#ffefb8";
+      cell.style.transition = "all 0.2s ease";
+    }
+  });
+}
+
+function solveTangoOnPage() {
+  console.log("[Tango] Starting solver...");
+
+  if (typeof getSolvedTango !== "function") {
+    return { success: false, error: "Tango solver is not available." };
+  }
+
+  const board = collectTangoBoard();
+  const result = getSolvedTango(board);
+  console.log("[Tango] Solver result:", result);
+
+  if (!result.success) {
+    return result;
+  }
+
+  const solution = result.solution || [];
+
+  highlightTango(solution);
+  const filledIndices = fillSolvedTangoBoard(solution);
+
+  return {
+    ...result,
+    filledIndices,
+  };
+}
+
 function collectQueensData() {
   const cells = document.querySelectorAll("[data-cell-idx]");
   const data = Array.from(cells).map((cell) => {
@@ -172,6 +263,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse(solveSudokuOnPage());
   } else if (request.action === "GET_TANGO_DATA") {
     sendResponse({ data: collectTangoBoard() });
+  } else if (request.action === "SOLVE_TANGO") {
+    sendResponse(solveTangoOnPage());
   } else if (request.action === "GET_QUEENS_DATA") {
     sendResponse({ data: collectQueensData() });
   } else if (request.action === "SOLVE_QUEENS") {
