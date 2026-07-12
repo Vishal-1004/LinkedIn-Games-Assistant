@@ -55,15 +55,16 @@ document.getElementById("run-queens-solver").addEventListener("click", async () 
   });
 });
 
-document.getElementById("run-tango-data").addEventListener("click", async () => {
+document.getElementById("run-tango-solver").addEventListener("click", async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  chrome.tabs.sendMessage(tab.id, { action: "GET_TANGO_DATA" }, (response) => {
+  chrome.tabs.sendMessage(tab.id, { action: "SOLVE_TANGO" }, (response) => {
     outputDiv.classList.add("show");
-    if (!response || !response.data) {
-      outputDiv.innerText = "Unable to read the Tango board from this page.";
+    console.log("[Popup] SOLVE_TANGO response:", response);
+    if (!response || !response.success) {
+      outputDiv.innerText = "Unable to solve the Tango board. " + (response?.error || "Please refresh the page and try again.");
       return;
     }
 
-    outputDiv.innerHTML = "<strong>Tango board read.</strong><br>Check the console for the extracted Moon/Sun array.";
+    outputDiv.innerHTML = "<strong>Tango solved.</strong><br>The board has been filled and highlighted; see the page for visual changes.";
   });
 });
