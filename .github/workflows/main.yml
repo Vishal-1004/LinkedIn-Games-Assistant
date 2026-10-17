@@ -23,7 +23,7 @@ jobs:
             const { owner, repo } = context.repo;
             const pull_number = context.issue.number;
 
-            const files = await github.pagination(
+            const files = await github.paginate(
               github.rest.pulls.listFiles,
                 {
                   owner,
