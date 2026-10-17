@@ -20,35 +20,29 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { owner, repo } = context.repo;
-            const pull_number = context.issue.number;
+            const {owner, repo} = context.repo;
+            cont prNumber = context.issue.number;
+            const {owner, repo} = await github.rest.pulls.listFiles({owner, repo, pull_number: prNumber});
 
-            const files = await github.paginate(
-              github.rest.pulls.listFiles,
-                {
-                  owner,
-                  repo,
-                  pull_number,
-                  per_page: 100
-                }
-              );
-              
-            const fileList = files.map(file => {
-              return `- **${file.status}** \`${file.filename}\` (+${file.additions}, -${file.deletions})`;
-            }).join('\n');
+            // 1. Display all modified files
+            console.log("Modified files: ");
+            files.forEach(file => console.log(file.filename));
 
-            const body = [
-              '## 📁 Pull Request File Change Report',
-              '',
-              `**Total files changed:** ${files.length}`,
-              '',
-              fileList || 'No changed files found.'
-            ].join('\n');
+            // 2. Check snake_case naming convention
+            const invalidFiles = files.filter(file =>
+              !/^[a-z0-9]+(_[a-z0-9]+)*\.[a-z]+$/.test(file.filename.split("/").pop())
+            );
 
-            await github.rest.issues.createComment({
-              owner,
-              repo,
-              issue_number: pull_number,
-              body
-            });
-        
+            if (invalidFiles.length > 0) {
+              console.log("⚠️ ALERT: These files do not follow snake_case naming:");
+              invalidFiles.forEach(file => console.log(file.filename));
+            } else {
+              console.log("✅ All modified files follow the naming convention.");
+            }
+
+            // 3. Check whether content.js was modified
+            if (files.some(file => file.filename.split("/").pop() === "content.js")) {
+              console.log("🚨 ALERT: content.js has been modified in this pull request!");
+            }else{
+            console.log("content.js has not been modified in this pull request!");
+            }
