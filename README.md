@@ -4,3 +4,4 @@
 ### fixed some syntax error in the workflow and now trying again
 ### show full report of files changed in workflow
 ### was some syntax issue,  just had it fixed, trying again
+### testing all the rules applied to our workflow
