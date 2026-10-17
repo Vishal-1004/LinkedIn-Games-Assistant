@@ -1,9 +1,12 @@
 name: My first workflow
 
 on:
-  push: 
+  pull_request: 
     branches: 
       - main
+
+permissions: 
+  pull-requests: write
 
 jobs:
   my_jobs:
@@ -12,4 +15,15 @@ jobs:
     steps:
       - name: Say Hello
         run: echo "Hello, Github Actions!"
+
+      - name: Comment on Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: "'Hello! My GitHub Actions workflow ran successfully.'
+            })
         
